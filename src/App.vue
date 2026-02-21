@@ -17,32 +17,39 @@ const { play: playDiceLanding } = useSound(diceLanding);
 
 const pips = ref();
 
-const getNextFace = () => {
-  const faces = [1, 2, 3, 4, 5, 6].filter((result) => result !== pips.value);
+const getNextFace = (currentFace) => {
+  const faces = [1, 2, 3, 4, 5, 6].filter((result) => result !== currentFace);
   const randomIndex = Math.floor(Math.random() * faces.length);
   return faces[randomIndex];
 };
 
-pips.value = getNextFace();
+pips.value = getNextFace(pips.value);
 
 const rollInterval = ref();
-const tumbleCount = ref(0);
+const rollFaces = ref([]);
 
 const rollDie = () => {
+  rollFaces.value = [];
+  clearInterval(rollInterval.value);
+
+  for (let i = 0; i < 10; i++) {
+    const lastFace = rollFaces.value[rollFaces.value.length - 1] || pips.value;
+    rollFaces.value.push(getNextFace(lastFace));
+  }
+
   playDiceShaking();
 
   rollInterval.value = setInterval(() => {
-    tumbleCount.value += 1;
-    pips.value = getNextFace();
+    pips.value = rollFaces.value[0];
+    rollFaces.value = rollFaces.value.slice(1);
   }, 100);
 };
 
-watch(tumbleCount, () => {
-  if (tumbleCount.value == 9) {
+watch(rollFaces, () => {
+  if (rollFaces.value.length == 0) {
     stopDiceShaking();
     playDiceLanding();
     clearInterval(rollInterval.value);
-    tumbleCount.value = 0;
   }
 });
 
