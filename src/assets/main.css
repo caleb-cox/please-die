@@ -1,0 +1,31 @@
+:root {
+  --saturation: 50%;
+  --lightness: 75%;
+  --color-red: hsl(0, var(--saturation), var(--lightness));
+  --color-yellow: hsl(60deg, var(--saturation), var(--lightness));
+  --color-green: hsl(120deg, var(--saturation), var(--lightness));
+  --color-cyan: hsl(180deg, var(--saturation), var(--lightness));
+  --color-blue: hsl(240deg, var(--saturation), var(--lightness));
+  --color-magenta: hsl(300deg, var(--saturation), var(--lightness));
+  --color-black: hsl(0, 0%, 10%);
+  --color-white: hsl(0, 0%, 90%);
+  font-size: min(3.75vw, 16px);
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
