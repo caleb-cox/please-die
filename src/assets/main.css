@@ -9,7 +9,7 @@
   --color-magenta: hsl(300deg, var(--saturation), var(--lightness));
   --color-black: hsl(0, 0%, 10%);
   --color-white: hsl(0, 0%, 90%);
-  font-size: min(3.5vw, 16px);
+  font-size: min(3.25vw, 16px);
 }
 
 * {
