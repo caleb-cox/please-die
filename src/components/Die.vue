@@ -30,7 +30,7 @@ const {
   send: sendRoll,
   data: receivedRoll,
   status: socketStatus,
-} = useWebSocket(socketUrl);
+} = useWebSocket(socketUrl, { autoReconnect: true });
 
 const pips = ref();
 const rollIntervalID = ref();
