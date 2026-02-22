@@ -10,7 +10,7 @@
     </div>
   </div>
   <div v-else class="status">
-    {{ socketStatus == "CONNECTING" ? socketStatus : "DISCONNECTED" }}
+    {{ { CONNECTING: "CONNECTING...", CLOSED: "DISCONNECTED" }[socketStatus] }}
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import diceShaking from "../assets/dice-shaking.mp3";
 import diceLanding from "../assets/dice-landing.mp3";
 
 const { socketUrl } = defineProps(["socketUrl"]);
+const emit = defineEmits(["clearSocketUrl"]);
 
 const { play: playDiceShaking, stop: stopDiceShaking } = useSound(diceShaking);
 const { play: playDiceLanding } = useSound(diceLanding);
@@ -30,7 +31,14 @@ const {
   send: sendRoll,
   data: receivedRoll,
   status: socketStatus,
-} = useWebSocket(socketUrl, { autoReconnect: true });
+} = useWebSocket(socketUrl, {
+  autoReconnect: {
+    retries: 3,
+    onFailed() {
+      emit("clearSocketUrl");
+    },
+  },
+});
 
 const pips = ref();
 const rollIntervalID = ref();

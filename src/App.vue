@@ -1,9 +1,10 @@
 <template>
-  <Die v-if="socketUrl" :socketUrl />
-  <KeyInput
-    v-else
-    @submit="(value) => (socketUrl = `https://${value}.loca.lt`)"
+  <Die
+    v-if="socketUrl"
+    :socketUrl
+    @clearSocketUrl="() => (socketUrl = undefined)"
   />
+  <KeyInput v-else @setSocketUrl="(value) => (socketUrl = value)" />
 </template>
 
 <script setup>
@@ -12,8 +13,4 @@ import Die from "./components/Die.vue";
 import KeyInput from "./components/KeyInput.vue";
 
 const socketUrl = ref();
-
-const onSubmit = () => {
-  socketUrl.value = inputValue.value;
-};
 </script>
