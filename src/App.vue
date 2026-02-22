@@ -8,6 +8,7 @@
 
 <script setup>
 import { ref, watch, computed } from "vue";
+import { useWebSocket } from "@vueuse/core";
 import { useSound } from "@vueuse/sound";
 import diceShaking from "./assets/dice-shaking.mp3";
 import diceLanding from "./assets/dice-landing.mp3";
@@ -15,42 +16,53 @@ import diceLanding from "./assets/dice-landing.mp3";
 const { play: playDiceShaking, stop: stopDiceShaking } = useSound(diceShaking);
 const { play: playDiceLanding } = useSound(diceLanding);
 
+const { send: sendRoll, data: receivedRoll } = useWebSocket(
+  "http://127.0.0.1:3000",
+  {
+    autoReconnect: true,
+    onConnected() {
+      console.log("Connected!");
+    },
+    onDisconnected() {
+      console.log("Disconnected!");
+    },
+  },
+);
+
 const pips = ref();
-
-const getNextFace = (currentFace) => {
-  const faces = [1, 2, 3, 4, 5, 6].filter((result) => result !== currentFace);
-  const randomIndex = Math.floor(Math.random() * faces.length);
-  return faces[randomIndex];
-};
-
-pips.value = getNextFace(pips.value);
-
-const rollInterval = ref();
-const rollFaces = ref([]);
+const rollIntervalID = ref();
 
 const rollDie = () => {
-  rollFaces.value = [];
-  clearInterval(rollInterval.value);
+  const getNextFace = (currentFace) => {
+    const faces = [1, 2, 3, 4, 5, 6].filter((result) => result !== currentFace);
+    const randomIndex = Math.floor(Math.random() * faces.length);
+    return faces[randomIndex];
+  };
 
+  const rollPayload = [];
   for (let i = 0; i < 10; i++) {
-    const lastFace = rollFaces.value[rollFaces.value.length - 1] || pips.value;
-    rollFaces.value.push(getNextFace(lastFace));
+    const lastFace = rollPayload[rollPayload.length - 1] || pips.value;
+    rollPayload.push(getNextFace(lastFace));
   }
 
-  playDiceShaking();
-
-  rollInterval.value = setInterval(() => {
-    pips.value = rollFaces.value[0];
-    rollFaces.value = rollFaces.value.slice(1);
-  }, 100);
+  sendRoll(JSON.stringify(rollPayload));
 };
 
-watch(rollFaces, () => {
-  if (rollFaces.value.length == 0) {
-    stopDiceShaking();
-    playDiceLanding();
-    clearInterval(rollInterval.value);
-  }
+watch(receivedRoll, () => {
+  clearInterval(rollIntervalID.value);
+  playDiceShaking();
+
+  const rollFaces = JSON.parse(receivedRoll.value);
+
+  rollIntervalID.value = setInterval(() => {
+    if (rollFaces.length > 0) {
+      pips.value = rollFaces.shift();
+    } else {
+      clearInterval(rollIntervalID.value);
+      stopDiceShaking();
+      playDiceLanding();
+    }
+  }, 100);
 });
 
 const colorClass = computed(() => {
@@ -71,7 +83,7 @@ const colorClass = computed(() => {
 .die {
   cursor: pointer;
   user-select: none;
-  border: 1.5em solid;
+  border: 1.5em solid var(--color-white);
   border-radius: 3em;
   height: 25em;
   width: 25em;
