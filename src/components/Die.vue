@@ -1,8 +1,16 @@
 <template>
-  <div class="die" :class="colorClass" @click="rollDie">
+  <div
+    v-if="socketStatus == 'OPEN'"
+    class="die"
+    :class="colorClass"
+    @click="rollDie"
+  >
     <div class="face">
       <div v-for="_ in pips" class="pip"></div>
     </div>
+  </div>
+  <div v-else class="status">
+    {{ socketStatus == "CONNECTING" ? socketStatus : "DISCONNECTED" }}
   </div>
 </template>
 
@@ -18,15 +26,11 @@ const { socketUrl } = defineProps(["socketUrl"]);
 const { play: playDiceShaking, stop: stopDiceShaking } = useSound(diceShaking);
 const { play: playDiceLanding } = useSound(diceLanding);
 
-const { send: sendRoll, data: receivedRoll } = useWebSocket(socketUrl, {
-  autoReconnect: true,
-  onConnected() {
-    console.log("Connected!");
-  },
-  onDisconnected() {
-    console.log("Disconnected!");
-  },
-});
+const {
+  send: sendRoll,
+  data: receivedRoll,
+  status: socketStatus,
+} = useWebSocket(socketUrl);
 
 const pips = ref();
 const rollIntervalID = ref();
@@ -79,6 +83,11 @@ const colorClass = computed(() => {
 </script>
 
 <style scoped>
+.status {
+  color: var(--color-white);
+  font-size: 2em;
+}
+
 .die {
   cursor: pointer;
   user-select: none;
