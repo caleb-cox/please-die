@@ -37,7 +37,7 @@ const {
   data: receivedRoll,
   status: socketStatus,
 } = useWebSocket(
-  `https://please-die-server-production.up.railway.app/${passKey}`,
+  `wss://please-die-server-production.up.railway.app/${passKey}`,
   {
     autoReconnect: {
       retries: 3,
