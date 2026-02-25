@@ -39,11 +39,8 @@ const {
 } = useWebSocket(
   `wss://please-die-server-production.up.railway.app/${passKey}`,
   {
-    autoReconnect: {
-      retries: 3,
-      onFailed() {
-        emit("clearPassKey");
-      },
+    onDisconnected() {
+      emit("clearPassKey");
     },
   },
 );
