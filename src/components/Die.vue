@@ -21,8 +21,13 @@ import { useSound } from "@vueuse/sound";
 import diceShaking from "../assets/dice-shaking.mp3";
 import diceLanding from "../assets/dice-landing.mp3";
 
-const { socketUrl } = defineProps(["socketUrl"]);
-const emit = defineEmits(["clearSocketUrl"]);
+const { passKey } = defineProps({
+  passKey: {
+    type: String,
+    required: true,
+  },
+});
+const emit = defineEmits(["clearPassKey"]);
 
 const { play: playDiceShaking, stop: stopDiceShaking } = useSound(diceShaking);
 const { play: playDiceLanding } = useSound(diceLanding);
@@ -31,14 +36,17 @@ const {
   send: sendRoll,
   data: receivedRoll,
   status: socketStatus,
-} = useWebSocket(socketUrl, {
-  autoReconnect: {
-    retries: 3,
-    onFailed() {
-      emit("clearSocketUrl");
+} = useWebSocket(
+  `http://please-die-server-production.up.railway.app/${passKey}`,
+  {
+    autoReconnect: {
+      retries: 3,
+      onFailed() {
+        emit("clearPassKey");
+      },
     },
   },
-});
+);
 
 const pips = ref();
 const rollIntervalID = ref();

@@ -1,16 +1,12 @@
 <template>
-  <Die
-    v-if="socketUrl"
-    :socketUrl
-    @clearSocketUrl="() => (socketUrl = undefined)"
-  />
-  <KeyInput v-else @setSocketUrl="(value) => (socketUrl = value)" />
+  <Die v-if="passKey" :pass-key @clearPassKey="() => (passKey = undefined)" />
+  <PassKeyInput v-else @setPassKey="(value) => (passKey = value)" />
 </template>
 
 <script setup>
 import { ref } from "vue";
 import Die from "./components/Die.vue";
-import KeyInput from "./components/KeyInput.vue";
+import PassKeyInput from "./components/PassKeyInput.vue";
 
-const socketUrl = ref();
+const passKey = ref();
 </script>

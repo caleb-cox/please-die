@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="$emit('setSocketUrl', `https://${value}.loca.lt`)">
+  <form @submit.prevent="$emit('setPassKey', value)">
     <input v-model="value" />
   </form>
 </template>
@@ -7,7 +7,7 @@
 <script setup>
 import { ref } from "vue";
 
-defineEmits(["setSocketUrl"]);
+defineEmits(["setPassKey"]);
 
 const value = ref();
 </script>
